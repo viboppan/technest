@@ -1,74 +1,131 @@
-body{
-    background-color: #eeeeee;
+/* General Body Styling */
+body {
+    background-color: #f9f9f9; /* Subtle light background */
+    font-family: cursive; /* Clean and modern font */
+    color: teal; /* Neutral text color */
+    margin: 0;
+    padding: 0;
 }
 
-.footer-background{
-    background-color: rgb(204, 199, 199);
+/* Shopping Cart Container */
+.container {
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Add shadow for card effect */
 }
 
-@media(max-width:991px){
-    #heading{
-        padding-left: 50px;
-    }
-    #prc{
-        margin-left: 70px;
-        padding-left: 110px;
-    }
-    #quantity{
-        padding-left: 48px;
-    }
-    #produc{
-        padding-left: 40px;
-    }
-    #total{
-        padding-left: 54px;
-    }
+#zero-pad {
+    padding: 0; /* Remove default padding */
 }
-@media(max-width:767px){
-    .mobile{
-        font-size: 10px;
-    }
-    h5{
-        font-size: 14px;
-    }
-    h6{
-        font-size: 9px;
-    }
-    #mobile-font{
-        font-size: 11px;
-    }
-    #prc{
-        font-weight: 700;
-        margin-left: -45px;
-        padding-left: 105px;
-    }
-    #quantity{
-        font-weight: 700;
-        padding-left: 6px;
-    }
-    #produc{
-        font-weight: 700;
-        padding-left: 0px;
-    }
-    #total{
-        font-weight: 700;
-        padding-left: 9px;
-    }
-    #image{
-        width: 60px;
-        height: 60px;
-    }
-    .col{
-        width: 100%;
-    }
-    #zero-pad{
-        padding: 2%;
-        margin-left: 10px;
-    }
-    #footer-font{
+
+/* Header Section */
+h5 {
+    font-size: 20px;
+    color: teal;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+#heading {
+    border-bottom: 1px solid #ddd; /* Add a light gray border */
+    padding: 10px 0;
+    font-weight: 600;
+    color: teal;
+}
+
+#heading div {
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+/* Cart Items */
+#cart-products .d-flex {
+    padding: 15px 0;
+    border-bottom: 1px solid #ddd; /* Add border between products */
+}
+
+#cart-products img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover; /* Ensure image fits in a uniform size */
+    border-radius: 8px; /* Rounded corners */
+    margin-right: 15px;
+}
+
+#cart-products h6 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+#cart-products .pl-md-3 {
+    font-size: 14px;
+    color: #555; /* Secondary text color for brand and color */
+}
+
+#cart-products b {
+    font-size: 16px;
+    color: #333; /* Bold and prominent cost text */
+}
+
+/* Footer Section */
+#footer-font {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+#total-cart {
+    font-size: 20px;
+    color: #333; /* Prominent total text */
+}
+
+/* Buttons */
+button {
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+#go-back {
+    background-color: teal;
+    border: 1px solid #333;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+#go-back:hover {
+    background-color: darkslategray;
+}
+
+#payment-button {
+    background-color: teal;
+    color: #fff;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+#payment-button:hover {
+    background-color: darkslategray;
+}
+
+/* Responsive Design */
+@media (max-width: 767px) {
+    #heading div {
         font-size: 12px;
     }
-    #heading{
-        padding-top: 15px;
+
+    #cart-products img {
+        width: 80px;
+        height: 80px;
+    }
+
+    #footer-font {
+        font-size: 16px;
+    }
+
+    #total-cart {
+        font-size: 18px;
     }
 }

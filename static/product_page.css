@@ -1,6 +1,6 @@
 body{
     background: none;
-    font-family: 'Open Sans', sans-serif !important;
+    font-family: cursive !important;
 }
 
 .shopping-cart{
@@ -15,9 +15,10 @@ body{
     z-index: 1000;
 }
 .logo{
-    font-size: 56px;
-    color: #3e8e41;
-    font-weight: 700;
+    font-size: 72px;
+    font-family: cursive;
+    color: teal;
+    font-weight: 900;
 }
 
 
@@ -37,10 +38,10 @@ body{
     width: calc(25% - 30px);
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    background-color: #ffffff;
+    background-color: antiquewhite;
     padding: 30px;
     box-sizing: border-box;
-    font-family: 'Arial', sans-serif;
+    font-family: 'Consolas', 'Menlo', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', monospace;
     text-align: center;
 }
 
@@ -63,7 +64,7 @@ body{
     width: 100%;
     padding: 15px;
     margin-top: 20px;
-    background-color: #4CAF50;
+    background-color: lightcoral;
     color: white;
     border: none;
     border-radius: 5px;
@@ -113,7 +114,7 @@ body{
     display: flex;
     align-items: center;
     padding: 15px;
-    background-color: #4CAF50;
+    background-color: teal;
     border-radius: 50%;
     color: #ffffff;
     cursor: pointer;
@@ -231,8 +232,10 @@ nav a:hover {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: #f2f2f2;
+            background-color: antiquewhite;
             padding: 2%;
+            font-family: cursive;
+            font-weight: bold;
         }
 
          /* Styles for the profile information within the modal */
@@ -380,12 +383,15 @@ nav a:hover {
             display: flex;
             flex-wrap: nowrap;
             justify-content: space-between;
-            width:65%;
+            width:100%;
+            background-color: ghostwhite;
         }
         .view-product-details{
             font-size: 18px;
             margin-top:2%;
             margin-left:10%;
+            font-family: cursive;
+            color: teal;
         }
 
 

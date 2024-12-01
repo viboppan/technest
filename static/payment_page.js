@@ -1,4 +1,5 @@
 let cartDetails = localStorage.getItem('cart');
+console.log(cartDetails);
 let cData = JSON.parse(localStorage.getItem('cData'));
 let payload = {
     "customer_id": "",
@@ -23,11 +24,11 @@ if (cartDetails && cartDetails !== 'undefined') {
     payload.products = cartDetails.map(product => {
         let info = {};
         info.product_id = product.product_id;
-        info.quantity = 1;
+        info.quantity = product.ordered_quantity;
         return info;
     });
 
-   const cartCost = cartDetails.reduce((sum, product) => sum + product.cost, 0);
+   const cartCost = cartDetails.reduce((sum, product) => sum + product.cost * product.ordered_quantity, 0);
    payload.total_cost = cartCost;
 
     console.log(payload);

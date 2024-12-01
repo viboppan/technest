@@ -2,11 +2,11 @@ from flask import Blueprint, request, render_template, redirect
 from mongoengine import connect
 
 from Collections.Order import get_orders_for_seller
-from utils.MongoDBUtils import Product
-from utils.MongoDBUtils import Seller
+from utils.MongoUtility import Product
+from utils.MongoUtility import Seller
 
 seller_endpoints = Blueprint('seller_endpoints', __name__, template_folder='templates')
-connect(host="mongodb://localhost:27017/furnihub")
+connect(host="mongodb://localhost:27017/technest")
 
 
 def get_seller(username):

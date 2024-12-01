@@ -106,9 +106,9 @@ function loadProducts(category) {
             productElement.innerHTML = `
             <img src="${product.image_url}" alt="${product.name}" class="product-image">
             <p>Name: ${product.name}</p>
-            <p>${product.color}</p>
+            <p>Color: ${product.color}</p>
             <p>Price: $${product.cost}</p>
-            <p>ID: ${product.product_id}</p>
+<!--            <p>ID: ${product.product_id}</p>-->
             <button class="add-to-cart" data-product-id='${JSON.stringify(product)}' id="add-cart">
                 Add to Cart
             </button>
@@ -179,13 +179,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     var orders = JSON.parse(JSON.stringify(ordersData)); // Copy the data to a new array
     const allProductsLink = document.getElementById('category-home');
-    const coffeeTableLink = document.getElementById('coffee-table-link');
-    const diningChairLink = document.getElementById('dining_chair-link');
-    const diningSetLink = document.getElementById('dining_set_link');
-    const officeChairLink = document.getElementById('office-chair-link');
-    const reclinerLink = document.getElementById('recliners-link');
-    const shoeCabinetLink = document.getElementById('shoe-cabinet-link');
-    const sofaLink = document.getElementById('sofa-link');
+    const phoneLink = document.getElementById('phone-link');
+    const webcamLink = document.getElementById('webcam-link');
+    const droneLink = document.getElementById('drone-link');
+    const hardDiskLink = document.getElementById('hard-disk-link');
+    const headphonesLink = document.getElementById('headphones-link');
+    const joystickLink = document.getElementById('joystick-link');
+    const watchLink = document.getElementById('watch-link');
 
 
     // Initial loading of products and attaching event listeners
@@ -199,45 +199,45 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log("Load cart", cart);
     });
 
-    coffeeTableLink.addEventListener('click', function(event) {
+    phoneLink.addEventListener('click', function(event) {
         event.preventDefault();
-        const filteredProducts = loadProducts('coffee_table');
+        const filteredProducts = loadProducts('phone');
         console.log("Load cart", cart);
     });
 
-    diningChairLink.addEventListener('click', function(event) {
+    webcamLink.addEventListener('click', function(event) {
         event.preventDefault();
-        const filteredProducts = loadProducts('dining_chair');
+        const filteredProducts = loadProducts('camera');
         console.log("Load cart", cart);
     });
 
-    diningSetLink.addEventListener('click', function(event) {
+    droneLink.addEventListener('click', function(event) {
         event.preventDefault();
-        const filteredProducts = loadProducts('dining_set');
+        const filteredProducts = loadProducts('drone');
         console.log("Load cart", cart);
     });
 
-    officeChairLink.addEventListener('click', function(event) {
+    hardDiskLink.addEventListener('click', function(event) {
         event.preventDefault();
-        const filteredProducts = loadProducts('office_chair');
+        const filteredProducts = loadProducts('hard_disk');
         console.log("Load cart", cart);
     });
 
-    reclinerLink.addEventListener('click', function(event) {
+    headphonesLink.addEventListener('click', function(event) {
         event.preventDefault();
-        const filteredProducts = loadProducts('reclyner');
+        const filteredProducts = loadProducts('headphone');
         console.log("Load cart", cart);
     });
 
-    shoeCabinetLink.addEventListener('click', function(event) {
+    joystickLink.addEventListener('click', function(event) {
         event.preventDefault();
-        const filteredProducts = loadProducts('shoe_cabinet');
+        const filteredProducts = loadProducts('joystick');
         console.log("Load cart", cart);
     });
 
-    sofaLink.addEventListener('click', function(event) {
+    watchLink.addEventListener('click', function(event) {
         event.preventDefault();
-        const filteredProducts = loadProducts('sofa');
+        const filteredProducts = loadProducts('watch');
         console.log("Load cart", cart);
     });
 

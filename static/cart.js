@@ -25,12 +25,12 @@ for (let i = 0; i < cartProducts.length; i++) {
             <span class='px-md-3 px-1'>${cartProducts[i].ordered_quantity}</span>
 <!--            <span class='fa fa-plus-square text-secondary'></span>-->
         </div>
-        <div class='pl-md-0 pl-1'><b>${cartProducts[i].cost}</b></div>
+        <div class='pl-md-0 pl-1'><b>${cartProducts[i].cost * cartProducts[i].ordered_quantity}</b></div>
         <div class='close' id='close-product' onclick='deleteProduct("${cartProducts[i].name}")'>&times;</div>
     </div>`;
     productData.appendChild(div);
 }
-document.getElementById('total-cart').innerText = "$" + totalCartPrice + "";
+document.getElementById('total-cart').innerText = "$" + totalCartPrice.toFixed(2) + "";
 
 document.getElementById('payment-button').addEventListener('click', function () {
     if(cartProducts.length > 0){

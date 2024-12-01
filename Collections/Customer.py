@@ -1,12 +1,12 @@
 from flask import request, Blueprint, render_template, session, redirect, url_for, jsonify, json
 from mongoengine import *
 
-from utils.MongoDBUtils import Order, Customer
-from utils.MongoDBUtils import Product
+from utils.MongoUtility import Order, Customer
+from utils.MongoUtility import Product
 
 customer_endpoints = Blueprint('customer_endpoints', __name__,
                                template_folder='templates')
-connect(host="mongodb://localhost:27017/furnihub")
+connect(host="mongodb://localhost:27017/technest")
 
 
 @customer_endpoints.route("/customer/add", methods=['POST'])

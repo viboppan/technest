@@ -1,13 +1,13 @@
 from flask import request, Blueprint, render_template, session, redirect, url_for, jsonify, json
 from mongoengine import *
 from mongoengine.base.common import get_document
-from utils.MongoDBUtils import Customer, Order, ProductBought, Product
+from utils.MongoUtility import Customer, Order, ProductBought, Product, Payment
 from Collections.Customer import get_product_page
 
 order_endpoints = Blueprint('order_endpoints', __name__,
                             template_folder='templates')
 
-connect(host="mongodb://localhost:27017/furnihub")
+connect(host="mongodb://localhost:27017/technest")
 
 
 @order_endpoints.route("/add_order", methods=['POST'])
@@ -140,6 +140,14 @@ def cancel_order_by_customer():
             order.order_status = "cancelled"
             order.save()
 
+            # Cancel associated payment(s)
+            print("Order ID: " + order_id)
+            payments = Payment.objects(order_id=str(order_id))
+            if payments:
+                for payment in payments:
+                    if payment.status != "refunded":
+                        payment.status = "refunded"
+                        payment.save()
             # Convert the order object to a dictionary for JSON serialization
             # order_data = order_dict = order_to_dict(order)
             # return get_product_page(customer_id)

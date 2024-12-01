@@ -1,11 +1,11 @@
 from flask import request, Blueprint, jsonify
 from mongoengine import connect, Document, StringField, FloatField
-from utils.MongoDBUtils import Payment, Order
+from utils.MongoUtility import Payment, Order
 
 payment_endpoints = Blueprint('payment_endpoints', __name__, template_folder='templates')
 
 # MongoDB Connection
-connect(host="mongodb://localhost:27017/furnihub")
+connect(host="mongodb://localhost:27017/technest")
 
 
 @payment_endpoints.route("/add_payment", methods=['POST'])
@@ -22,7 +22,6 @@ def add_payment():
         if not existing_order:
             return jsonify({"error": f"Order with ID {payment_data['order_id']} does not exist"}), 400
 
-        print("HI")
         # Create Payment document
         payment = Payment(
             # payment_id='...some_payment_id...',  # Replace with the actual Payment ID
@@ -38,3 +37,26 @@ def add_payment():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 400
+
+
+@payment_endpoints.route("/cancel_payment/<payment_id>", methods=['PUT'])
+def cancel_payment(payment_id):
+    try:
+        # Find the payment record using the provided payment_id
+        payment = Payment.objects(id=payment_id).first()
+
+        if not payment:
+            return jsonify({"error": f"Payment with ID {payment_id} does not exist"}), 404
+
+        # Update the payment status to 'cancelled'
+        if payment.status == "cancelled":
+            return jsonify({"message": "Payment is already cancelled"}), 200
+
+        payment.status = "cancelled"
+        payment.save()
+
+        return jsonify({"message": "Payment status updated to cancelled", "payment_id": str(payment.id)}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+

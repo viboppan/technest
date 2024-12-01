@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from utils.MongoDBUtils import Book  # Import the Book model
+from utils.MongoUtility import Book  # Import the Book model
 from bson import ObjectId
 
 # Create a Flask Blueprint for book-related routes

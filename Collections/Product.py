@@ -5,7 +5,7 @@ from flask import Blueprint, request, jsonify, render_template
 
 from Collections.Customer import get_product_page
 from Collections.Seller import get_products
-from utils.MongoDBUtils import Product
+from utils.MongoUtility import Product
 
 # APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 # print(APP_ROOT)
@@ -39,7 +39,7 @@ def add_product():
         if image_file:
             # Create the target folder if it doesn't exist
             parent_folder_path = str(Path(os.path.dirname(__file__)).parents[0])
-            target_folder = parent_folder_path + '\\static\\images\\' + category
+            target_folder = parent_folder_path + '\\static\\pictures\\' + category
             os.makedirs(target_folder, exist_ok=True)
             print("85")
 
