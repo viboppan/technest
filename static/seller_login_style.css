@@ -1,0 +1,89 @@
+/* General Styling */
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #ffffff; /* Plain white background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Wrapper Styling */
+.wrapper {
+    width: 100%;
+    max-width: 400px;
+    background: #f9f9f9; /* Slightly off-white background for the container */
+    padding: 25px 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Soft shadow for container */
+}
+
+/* Header Styling */
+h1 {
+    font-size: 1.6rem;
+    color: #333; /* Dark gray for text */
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+/* Form Inputs */
+input.text {
+    width: 100%;
+    padding: 10px 15px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd; /* Subtle gray border */
+    border-radius: 5px;
+    font-size: 14px;
+    outline: none;
+    transition: border 0.3s ease-in-out;
+}
+
+input.text:focus {
+    border-color: teal; /* Highlighted blue border on focus */
+}
+
+/* Submit Buttons */
+input[type="submit"] {
+    width: 100%;
+    background: teal; /* Blue button */
+    color: #fff;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+}
+
+input[type="submit"]:hover {
+    background: darkslategray; /* Darker teal on hover */
+}
+
+/* Toggle Links */
+.toggle-link {
+    font-size: 14px;
+    margin-top: 10px;
+    display: block;
+    text-align: center;
+}
+
+.toggle-link a {
+    color: teal;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.toggle-link a:hover {
+    text-decoration: underline;
+}
+
+/* Error Message Styling */
+p {
+    color: #dc3545; /* Red for error messages */
+    font-size: 14px;
+    margin-bottom: 10px;
+    text-align: center;
+}
