@@ -321,7 +321,7 @@ nav a:hover {
         .order-status {
             display: inline-block;
             padding: 8px 16px;
-            background-color: #4CAF50; /* Green color for 'Completed' status, you can change it */
+            background-color: teal; /* Green color for 'Completed' status, you can change it */
             color: #fff;
             border-radius: 5px;
         }

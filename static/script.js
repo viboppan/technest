@@ -285,7 +285,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div>
                         <button class="cancel-order-button" 
                                 data-product-id='${order.order_id}' 
-                                id="cancel-order" style="background-color: red; visibility: ${order.order_status.toLowerCase() === 'cancelled' ? 'hidden' : 'visible'};" >
+                                id="cancel-order" style="background-color: black; visibility: ${order.order_status.toLowerCase() === 'cancelled' ? 'hidden' : 'visible'};" >
                             Cancel Order
                         </button>
                     </div>

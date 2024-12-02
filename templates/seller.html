@@ -10,139 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 20px;
-            background-color: #f4f4f4;
-        }
-
-        .navbar {
-            overflow: hidden;
-            background-color: #333;
-            margin-bottom: 20px;
-        }
-
-        .navbar a {
-            float: left;
-            display: block;
-            color: white;
-            text-align: center;
-            padding: 14px 16px;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .navbar a:hover {
-            background-color: #ddd;
-            color: black;
-        }
-
-        .col-container {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-        }
-
-        .col-6 {
-            width: 48%;
-            margin-bottom: 20px;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        form {
-            max-width: 100%;
-            margin: auto;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-        }
-
-        input,
-        select,
-        textarea {
-            width: calc(100% - 16px);
-            padding: 8px;
-            margin-bottom: 16px;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-
-        button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-
-        .popup-message {
-            display: none;
-            background-color: #4CAF50;
-            color: white;
-            text-align: center;
-            padding: 10px;
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 300px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .large-text-container {
-            width: 100%;
-            text-align: right;
-            position: absolute; /* Changed */
-            top: 0; /* Changed */
-            right: 0; /* Changed */
-            padding: 20px; /* Added */
-        }
-
-        .large-text {
-            font-size: 36px;
-            font-weight: bold;
-        }
-
-        .product {
-            border: 1px solid #e0e0e0;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            width: 300px;
-            background-color: #fff;
-        }
-
-        .product img {
-            max-width: 100%;
-            height: auto;
-        }
-
-        .product h2 {
-            font-size: 1.5rem;
-            margin: 10px 0;
-        }
-
-        .product p {
-            font-size: 1rem;
-            color: #555;
-        }
-    </style>
+    <link rel="stylesheet" href="../static/sellerstyle.css">
 </head>
 <body>
 <div class="container-fluid">
@@ -167,7 +35,7 @@
                 </button>
             </li>
         </ul>
-        <a class="align-end" href="/seller">logout</a>
+        <a class="align-end" href="/seller/login">logout</a>
     </div>
     <div id="popupMessage" class="popup-message"></div>
     <div class="tab-content" id="pills-tabContent">
@@ -228,7 +96,7 @@
                         <label for="available_quantity">Available Quantity:</label>
                         <input type="number" id="available_quantity" name="available_quantity" required>
 
-                        <button type="submit" id="add-product" value="ADD PRODUCT">Add Product</button>
+                        <button type="submit" id="add-product" value="ADD PRODUCT"  style="background-color: teal">Add Product</button>
                     </form>
                 </div>
             </div>
@@ -280,7 +148,7 @@
                                                               method="POST">
                                                             <input type="text" class="d-none" name="seller_id"
                                                                    value="{{ product.product.seller_id }}">
-                                                            <button class="btn btn-success btn-lg" type="submit">Confirm
+                                                            <button class="btn btn-success btn-lg" type="submit" style="background-color: teal">Confirm
                                                             </button>
                                                         </form>
                                                     {% elif order.order_status == "confirmed" %}
@@ -290,7 +158,7 @@
                                                                   method="POST">
                                                                 <input type="text" class="d-none" name="seller_id"
                                                                        value="{{ product.product.seller_id }}">
-                                                                <button class="btn btn-info btn-lg" type="submit">Pick
+                                                                <button class="btn btn-info btn-lg" type="submit" style="background-color: teal; color: white">Picked
                                                                     up
                                                                 </button>
                                                             </form>
@@ -299,7 +167,7 @@
                                                                   method="POST">
                                                                 <input type="text" class="d-none" name="seller_id"
                                                                        value="{{ product.product.seller_id }}">
-                                                                <button class="btn btn-primary btn-lg" type="submit">
+                                                                <button class="btn btn-primary btn-lg" type="submit" style="background-color: teal">
                                                                     Delivered
                                                                 </button>
                                                             </form>
@@ -308,7 +176,7 @@
                                                 </div>
                                                 <div class="row">
                                                     <form action="/cancel_order/{{ order.order_id }}">
-                                                        <button class="btn btn-danger btn-lg" type="submit">Cancel
+                                                        <button class="btn btn-danger btn-lg" type="submit" style="background-color: lightcoral">Cancel
                                                         </button>
                                                     </form>
                                                 </div>
