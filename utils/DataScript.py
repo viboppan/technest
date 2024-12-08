@@ -1,12 +1,12 @@
 import os
 import re
+import uuid
 
-from bson import ObjectId
 from mongoengine import connect, Document, StringField, FloatField, ListField, FloatField, ObjectIdField, IntField
 from faker import Faker
 import random
 
-from utils.MongoUtility import Seller as Vendor, Product as Item, Customer as Shopper
+from utils.MongoUtility import Seller as Vendor, Product as Item, Customer as Shopper, ProductInstance, Admin
 
 faker_instance = Faker()
 
@@ -34,6 +34,7 @@ def get_color_from_filename(file_name):
     # Default to "black" if no color is found
     return "black"
 
+
 # Function to insert products from images in folders with random data and color detection
 def populate_items_from_images(directory_path):
     vendor_instance = Vendor(
@@ -55,6 +56,14 @@ def populate_items_from_images(directory_path):
         address="123 Default Street, Dev City"
     )
     default_shopper.save()
+    # Create a sample admin user
+    admin = Admin(
+        admin_username="admin",
+        email="admin@example.com",
+        password="admin123",  # Consider hashing this password in a real scenario
+        role="superadmin"  # or another role if applicable
+    )
+    admin.save()
     vendor_identifier = str(vendor_instance.id)
     for folder_name in os.listdir(directory_path):
         category_directory = os.path.join(directory_path, folder_name)
@@ -64,7 +73,8 @@ def populate_items_from_images(directory_path):
 
                 # Extract color from the filename
                 detected_color = get_color_from_filename(image_name)
-
+                # Random quantity
+                available_quantity = round(random.uniform(4, 40), 0)
                 # Create a new Product document with random data and detected color
                 item_instance = Item(
                     name=f"{folder_name}{idx + 1}",
@@ -75,13 +85,29 @@ def populate_items_from_images(directory_path):
                     material_type="metal",
                     weight=round(random.uniform(1, 50), 2),
                     seller_id=vendor_identifier,
-                    rating=round(random.uniform(1, 5), 1),
                     image_url=image_location,  # Store local path as image_url
                     category=folder_name,
                     description="This awesome product provides you fabulous performance",
-                    available_quantity=round(random.uniform(4, 40), 0)
+                    available_quantity=int(available_quantity)
                 )
                 item_instance.save()
+                # Generate ProductInstance documents for each unit
+                for i in range(0, int(available_quantity)):
+                    ProductInstance(
+                        product=item_instance,
+                        serial_number=generate_serial_number(item_instance.name),
+                        status='in_stock'
+                    ).save()
+
+
+def generate_serial_number(product_name):
+    abbreviation = product_name[:3].upper()
+    last_char = product_name[-1].upper()
+    code = abbreviation + last_char
+
+    # Generate a random UUID and shorten it (e.g., first 8 chars)
+    unique_suffix = uuid.uuid4().hex[:8].upper()  # 8-char unique code
+    return f"{code}{unique_suffix}"
 
 
 # Driver code

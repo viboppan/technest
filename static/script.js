@@ -77,7 +77,6 @@ function openProductModal(product) {
                   <p><b>Brand:</b> ${product.brand}</p>
                   <p><b>Material:</b> ${product.material}</p>
                   <p><b>Weight:</b> ${product.weight}</p>
-                  <p><b>Rating:</b> ${product.rating}</p>
                   <p><b>Description:</b> ${product.description}</p>
                   <!-- Add other details as needed -->
                 </div>
@@ -162,6 +161,47 @@ function getCancelButtons() {
         }
     });
 }
+
+function getReturnButtons() {
+    const returnButtons = document.querySelectorAll('.return-order-button');
+    returnButtons.forEach(button => {
+        if (!button.hasEventListener) {
+            button.hasEventListener = true; // Mark the button to avoid attaching multiple event listeners
+            button.addEventListener('click', function(e) {
+                var orderID = button.getAttribute('data-product-id');
+                console.log(orderID);
+
+                const url = 'http://localhost:5000/customer/return_order';
+                const order = orders.filter(order => order.order_id == orderID);
+                const customerID = order[0].customer_id;
+                console.log(order);
+
+                let returnPayload = {
+                    "order_id": orderID,
+                    "customer_id": customerID
+                };
+                console.log(returnPayload);
+
+                postData(url, returnPayload)
+                    .then(responseData => {
+                        console.log('Success:', responseData);
+                        orders.map(order => {
+                            if (order.order_id == orderID) {
+                                order.order_status = "returned";
+                                button.parentElement.parentElement.querySelector('.order-status').innerText = order.order_status;
+                                button.style.visibility = 'hidden';
+                            }
+                        });
+                        console.log(orders);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            });
+        }
+    });
+}
+
 function postData(url = '', data = {}) {
     // Default options are marked with *
     return fetch(url, {
@@ -285,8 +325,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div>
                         <button class="cancel-order-button" 
                                 data-product-id='${order.order_id}' 
-                                id="cancel-order" style="background-color: black; visibility: ${order.order_status.toLowerCase() === 'cancelled' ? 'hidden' : 'visible'};" >
+                                id="cancel-order" style="background-color: teal; visibility: ${order.order_status.toLowerCase() === 'cancelled' || 'picked up' ? 'hidden' : 'visible'};" >
                             Cancel Order
+                        </button>
+                        <button class="return-order-button" 
+                                data-product-id='${order.order_id}' 
+                                id="return-order" style="background-color: teal; visibility: ${order.order_status.toLowerCase() === 'delivered' || 'picked up' ? 'visible' : 'hidden'};" >
+                            Return Order
                         </button>
                     </div>
                 </div>
@@ -318,7 +363,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         getCancelButtons();
-
+        getReturnButtons();
     });
 
     document.getElementById('profile').addEventListener('click', function() {

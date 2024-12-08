@@ -80,6 +80,25 @@ input[type="submit"]:hover {
     text-decoration: underline;
 }
 
+.text.dropdown {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    appearance: none;  /* Removes default arrow in some browsers */
+    -webkit-appearance: none; /* Safari & Chrome */
+    -moz-appearance: none; /* Firefox */
+    background: white url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20fill%3D%22%23333%22%20height%3D%2216px%22%20width%3D%2216px%22%20viewBox%3D%220%200%2024%2024%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M7%2010l5%205%205-5z%22/%3E%3C/svg%3E") no-repeat right 10px center;
+    background-size: 16px 16px;
+    cursor: pointer;
+}
+
+.text.dropdown:focus {
+    border-color: #555;
+    outline: none;
+}
+
 /* Error Message Styling */
 p {
     color: #dc3545; /* Red for error messages */

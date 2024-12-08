@@ -1,3 +1,5 @@
+import datetime
+
 from flask import request, Blueprint, render_template, session, redirect, url_for, jsonify, json
 from mongoengine import *
 
@@ -20,13 +22,36 @@ def add_user():
         customer = Customer.objects(email=email).first()
         if customer:
             return "email already taken"
-        customer = Customer(first_name=request.form.get('first_name'),
-                            last_name=request.form.get('last_name'),
-                            username=username,
-                            email=email,
-                            password=request.form.get('password'),
-                            mobile_number=request.form.get('phone'),
-                            address=request.form.get('address'))
+        first_name = request.form.get('first_name')
+        last_name = request.form.get('last_name')
+        password = request.form.get('password')
+        phone = request.form.get('phone')
+        dob_str = request.form.get('dob')
+        address_line1 = request.form.get('address_line1')
+        address_line2 = request.form.get('address_line2')
+        city = request.form.get('city')
+        state = request.form.get('state')
+        zipcode = request.form.get('zipcode')
+        full_address = f"{address_line1}, {address_line2}, {city}, {state} {zipcode}".strip(", ")
+
+        # Parse the DOB from the form (assuming format YYYY-MM-DD)
+        dob = None
+        if dob_str:
+            try:
+                dob = datetime.datetime.strptime(dob_str, '%Y-%m-%d').date()
+            except ValueError:
+                return "Invalid date format for DOB. Please use YYYY-MM-DD."
+
+        customer = Customer(
+            first_name=first_name,
+            last_name=last_name,
+            username=username,
+            email=email,
+            password=password,
+            mobile_number=phone,
+            dob=dob,
+            address=full_address
+        )
         customer.save()
         return redirect("/")
     else:
@@ -44,7 +69,6 @@ def to_dict(self):
         "material_type": self.material_type,
         "weight": self.weight,
         "seller_id": self.seller_id,
-        "rating": self.rating,
         "image_url": self.image_url
     }
 
@@ -74,7 +98,7 @@ def get_product_page(customerid):
     products_data = [
         {"name": p.name, "cost": p.cost, "dimensions": p.dimensions, "color": p.color, "brand": p.brand,
          "material": p.material_type, "weight": p.weight, "seller_id": p.seller_id,
-         "rating": p.rating, "image_url": p.image_url, "product_id": str(p.id),
+          "image_url": p.image_url, "product_id": str(p.id),
          "available_quantity": p.available_quantity, "category": p.category, "description": p.description} for p in products]
     print("Orders : ")
     print(orders_data)
@@ -95,9 +119,9 @@ def login():
             # return render_template('homepage.html')
         else:
             error = "Invalid username or password. Please try again."
-            return render_template('creativelogin.html', error=error)
+            return render_template('customerlogin.html', error=error)
 
-    return render_template('creativelogin.html')
+    return render_template('customerlogin.html')
 
     # Function to get orders for a given customer
 

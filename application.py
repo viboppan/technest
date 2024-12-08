@@ -1,6 +1,6 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect
 
-from Collections.Book import book_endpoints
+from Collections.Admin import admin_endpoints
 from Collections.Customer import customer_endpoints, get_product_page
 from Collections.Order import order_endpoints
 from Collections.Payment import payment_endpoints
@@ -13,12 +13,12 @@ app1.register_blueprint(order_endpoints)
 app1.register_blueprint(payment_endpoints)
 app1.register_blueprint(seller_endpoints)
 app1.register_blueprint(product_endpoints)
-app1.register_blueprint(book_endpoints)
-
+app1.register_blueprint(admin_endpoints)
+app1.secret_key = "1234"
 
 @app1.route('/')
 def hello_world():  # put application's code here
-    return render_template("creativelogin.html")
+    return render_template("customerlogin.html")
 
 
 @app1.route('/customer/cart_page')
@@ -53,7 +53,11 @@ def seller_login():  # put application's code here
 
 @app1.route('/login')
 def customer():  # put application's code here
-    return render_template("creativelogin.html")
+    return render_template("customerlogin.html")
+
+@app1.route('/admin')
+def admin_main():
+    return redirect('/admin/login')
 
 
 if __name__ == '__main__':

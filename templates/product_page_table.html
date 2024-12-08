@@ -19,7 +19,7 @@
             <th>Material Type</th>
             <th>Weight</th>
             <th>Seller ID</th>
-            <th>Rating</th>
+
         </tr>
         {% for product in products %}
         <tr>
@@ -31,7 +31,6 @@
             <td>{{ product.material_type }}</td>
             <td>{{ product.weight }}</td>
             <td>{{ product.seller_id }}</td>
-            <td>{{ product.rating }}</td>
         </tr>
         {% endfor %}
     </table>

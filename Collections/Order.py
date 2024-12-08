@@ -10,6 +10,22 @@ order_endpoints = Blueprint('order_endpoints', __name__,
 connect(host="mongodb://localhost:27017/technest")
 
 
+def update_product_instances_to_ordered(product, status, product_quantity):
+    productInstance1 = get_document('ProductInstance')
+    # Now find the required number of ProductInstances that are 'in_stock' for this product
+    available_instances = productInstance1.objects(product=product, status='in_stock').limit(
+        product_quantity)
+    if available_instances.count() < product_quantity:
+        return jsonify({"error": f"Not enough in-stock units for product with ID {product_id}"}), 400
+    allocated_serials = []
+    # Update each selected unit's status to 'ordered'
+    for instance in available_instances:
+        instance.status = status
+        instance.save()
+        allocated_serials.append(instance.serial_number)
+    return allocated_serials
+
+
 @order_endpoints.route("/add_order", methods=['POST'])
 def add_order():
     try:
@@ -31,9 +47,11 @@ def add_order():
             else:
                 product.available_quantity -= product_quantity
                 product.save()
-            # Create ProductBought instance
-            product_bought_instance = ProductBought(product_id=product_id, quantity=product_quantity)
-            product_bought_instances.append(product_bought_instance)
+                allocated_serial_numbers = update_product_instances_to_ordered(product, 'ordered', product_quantity)
+                # Create ProductBought instance
+                product_bought_instance = ProductBought(product_id=product_id, quantity=product_quantity,
+                                                        serial_numbers=allocated_serial_numbers)
+                product_bought_instances.append(product_bought_instance)
 
         # Calculate total cost
         total_cost = order_data.get('total_cost')
@@ -78,6 +96,7 @@ def get_order(order_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
+
 @order_endpoints.route("/cancel_order/<order_id>", methods=['GET'])
 def cancel_order(order_id):
     try:
@@ -112,18 +131,19 @@ def cancel_order(order_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
+
 @order_endpoints.route("/customer/cancel_order", methods=['POST'])
 def cancel_order_by_customer():
     try:
         order_data = request.json
-        order_id=order_data.get('order_id')
+        order_id = order_data.get('order_id')
         # customer_id=order_data.get('customer_id')
         # Retrieve the order based on the order ID
         order = Order.objects(id=str(order_id)).first()
         if order:
             if order.order_status == "cancelled":
                 return jsonify({"error": f"Order with ID {order_id} already cancelled"}), 400
-
+            product_instance_model = get_document('ProductInstance')
             # Iterate through products in the order
             for product_info in order.products:
                 product_id = product_info.product_id.id
@@ -136,6 +156,13 @@ def cancel_order_by_customer():
                     # Increase the available quantity for the product
                     product.available_quantity += quantity
                     product.save()
+
+                    # Revert ProductInstance statuses to 'in_stock'
+                    for serial_num in product_info.serial_numbers:
+                        instance = product_instance_model.objects(serial_number=serial_num).first()
+                        if instance and instance.status == 'ordered':
+                            instance.status = 'in_stock'
+                            instance.save()
 
             order.order_status = "cancelled"
             order.save()
@@ -158,7 +185,64 @@ def cancel_order_by_customer():
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
-@order_endpoints.route("/confirm_order/<order_id>", methods=['GET','POST'])
+
+@order_endpoints.route("/customer/return_order", methods=['POST'])
+def return_order_by_customer():
+    try:
+        print("hi")
+        order_data = request.json
+        print("id: "+order_data.get('order_id'))
+        order_id = order_data.get('order_id')
+        # Retrieve the order based on the order ID
+        order = Order.objects(id=str(order_id)).first()
+        print("hi2")
+        if not order:
+            return jsonify({"error": f"Order with ID {order_id} not found"}), 404
+
+        if order.order_status.lower() not in ["delivered", "picked up"]:
+            return jsonify({"error": "Order cannot be returned as it is not delivered or picked up"}), 400
+        print("hi3")
+        product_instance_model = get_document('ProductInstance')
+        print("hi4")
+        # Iterate through products in the order
+        for product_info in order.products:
+            product_id = product_info.product_id.id
+            quantity = product_info.quantity
+
+            # Retrieve the product based on the product ID
+            product = Product.objects(id=product_id).first()
+
+            if product:
+                # Increase the available quantity for the product
+                product.available_quantity += quantity
+                product.save()
+
+                # Revert ProductInstance statuses to 'in_stock'
+                for serial_num in product_info.serial_numbers:
+                    instance = product_instance_model.objects(serial_number=serial_num).first()
+                    if instance and instance.status in ['delivered', 'picked_up']:
+                        instance.status = 'in_stock'
+                        instance.save()
+
+        # Update the order status
+        order.order_status = "returned"
+        order.save()
+
+        # Process refund (if applicable)
+        payments = Payment.objects(order_id=str(order_id))
+        if payments:
+            for payment in payments:
+                if payment.status != "refunded":
+                    payment.status = "refunded"
+                    payment.save()
+
+        return jsonify({"message": "Order returned successfully"}), 201
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+
+@order_endpoints.route("/confirm_order/<order_id>", methods=['GET', 'POST'])
 def dispatch_order(order_id):
     try:
         # Retrieve the order based on the order ID
@@ -179,7 +263,8 @@ def dispatch_order(order_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
-@order_endpoints.route("/pick_up_order/<order_id>", methods=['GET','POST'])
+
+@order_endpoints.route("/pick_up_order/<order_id>", methods=['GET', 'POST'])
 def pickup_order(order_id):
     try:
         # Retrieve the order based on the order ID
@@ -200,7 +285,8 @@ def pickup_order(order_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
-@order_endpoints.route("/deliver_order/<order_id>", methods=['GET','POST'])
+
+@order_endpoints.route("/deliver_order/<order_id>", methods=['GET', 'POST'])
 def delivered_order(order_id):
     try:
         # Retrieve the order based on the order ID
@@ -221,11 +307,12 @@ def delivered_order(order_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
+
 @order_endpoints.route("/get_orders_for_seller/<seller_id>", methods=['GET'])
 def get_orders_for_seller(seller_id):
     try:
         # Retrieve the products sold by the seller
-        print(seller_id+" here")
+        print(seller_id + " here")
         seller_products = Product.objects(seller_id=seller_id)
         print(seller_products)
         # Extract product IDs
@@ -245,10 +332,10 @@ def get_orders_for_seller(seller_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
+
 def order_to_dict(order):
     products_list = []
     for product_bought in order.products:
-
         product_dict = {
             'product_id': str(product_bought.product_id.id),
             'quantity': product_bought.quantity
@@ -267,11 +354,13 @@ def order_to_dict(order):
     }
     return order_dict
 
+
 def orderedprods_to_dict(order, product_objects):
     products_list = []
     for product_bought in order.products:
         # Find the product object in product_objects list based on product ID
-        product_object = next((prod for prod in product_objects if str(prod.id) == str(product_bought.product_id.id)), None)
+        product_object = next((prod for prod in product_objects if str(prod.id) == str(product_bought.product_id.id)),
+                              None)
 
         if product_object:
             product_dict = {
@@ -285,7 +374,6 @@ def orderedprods_to_dict(order, product_objects):
                     'material_type': product_object.material_type,
                     'weight': product_object.weight,
                     'seller_id': product_object.seller_id,
-                    'rating': product_object.rating,
                     'image_url': product_object.image_url,
                     'category': product_object.category,
                     'description': product_object.description,

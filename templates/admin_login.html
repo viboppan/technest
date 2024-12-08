@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Technest Admin Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link href="../static/seller_login_style.css" rel="stylesheet" type="text/css" media="all">
+    <link href="//fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i" rel="stylesheet">
+</head>
+<body>
+<div class="wrapper">
+    <h1>Technest Admin Login</h1>
+    <div class="main-agileinfo">
+        <div class="agileits-top">
+            <form action="/admin/login" method="post" id="adminLoginForm">
+                <input class="text" type="text" name="username" placeholder="Admin Username" required>
+                <input class="text" type="password" name="password" placeholder="Password" required>
+                <input type="submit" id="login-button" value="LOGIN">
+                {% if error %}
+                    <p>{{ error }}</p>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

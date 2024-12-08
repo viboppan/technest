@@ -54,7 +54,7 @@
                         <input type="number" id="cost" name="cost" step="0.01" required>
 
                         <label for="dimensions">Dimensions:</label>
-                        <input type="text" id="dimensions" name="dimensions" placeholder="e.g., 10.0, 5.0, 2.5"
+                        <input type="text" id="dimensions" name="dimensions" placeholder="e.g. 10.0*5.0*2.5"
                                required>
 
                         <label for="color">Color:</label>
@@ -72,9 +72,6 @@
                         <label for="seller_id" style="display: none;">Seller ID:</label>
                         <input type="text" id="seller_id" name="seller_id" value="{{ seller_id }}" readonly
                                style="display: none;">
-
-                        <label for="rating">Rating:</label>
-                        <input type="number" id="rating" name="rating" step="0.1" min="1" max="5">
 
                         <label for="image">Select Image: </label>
                         <input type="file" id="image" name="image" accept="image/*" required>
@@ -96,7 +93,14 @@
                         <label for="available_quantity">Available Quantity:</label>
                         <input type="number" id="available_quantity" name="available_quantity" required>
 
-                        <button type="submit" id="add-product" value="ADD PRODUCT" style="background-color: teal">Add Product</button>
+                        <input type="hidden" id="serial_numbers" name="serial_numbers" value="">
+
+                        <!-- A container to show the generated serial numbers preview -->
+                        <div id="serialNumbersPreview" style="margin-top:20px;"></div>
+
+                        <button type="submit" id="add-product" value="ADD PRODUCT" style="background-color: teal">Add
+                            Product
+                        </button>
                     </form>
                 </div>
             </div>
@@ -104,7 +108,7 @@
         <div class="tab-pane fade" id="pills-products" role="tabpanel" aria-labelledby="pills-products-tab"
              tabindex="0">
             <div class="row">
-                {% for product in products_data %}
+                {% for product in products %}
                     <div class="col-2 product">
                         <img src="{{ product['image_url'] }}" alt="{{ product['name'] }}" class="product-image">
                         <p>Name: {{ product['name'] }}</p>
@@ -148,7 +152,8 @@
                                                               method="POST">
                                                             <input type="text" class="d-none" name="seller_id"
                                                                    value="{{ product.product.seller_id }}">
-                                                            <button class="btn btn-success btn-lg" type="submit" style="background-color: teal">Confirm
+                                                            <button class="btn btn-success btn-lg" type="submit"
+                                                                    style="background-color: teal">Confirm
                                                             </button>
                                                         </form>
                                                     {% elif order.order_status == "confirmed" %}
@@ -158,7 +163,9 @@
                                                                   method="POST">
                                                                 <input type="text" class="d-none" name="seller_id"
                                                                        value="{{ product.product.seller_id }}">
-                                                                <button class="btn btn-info btn-lg" type="submit" style="background-color: teal; color: white">Picked
+                                                                <button class="btn btn-info btn-lg" type="submit"
+                                                                        style="background-color: teal; color: white">
+                                                                    Picked
                                                                     up
                                                                 </button>
                                                             </form>
@@ -167,7 +174,8 @@
                                                                   method="POST">
                                                                 <input type="text" class="d-none" name="seller_id"
                                                                        value="{{ product.product.seller_id }}">
-                                                                <button class="btn btn-primary btn-lg" type="submit" style="background-color: teal">
+                                                                <button class="btn btn-primary btn-lg" type="submit"
+                                                                        style="background-color: teal">
                                                                     Delivered
                                                                 </button>
                                                             </form>
@@ -176,7 +184,8 @@
                                                 </div>
                                                 <div class="row">
                                                     <form action="/cancel_order/{{ order.order_id }}">
-                                                        <button class="btn btn-danger btn-lg" type="submit" style="background-color: lightcoral">Cancel
+                                                        <button class="btn btn-danger btn-lg" type="submit"
+                                                                style="background-color: lightcoral">Cancel
                                                         </button>
                                                     </form>
                                                 </div>
@@ -226,6 +235,95 @@
         // Implement cancel dispatch logic
         alert("Dispatch canceled!");
     }
+
+    const previewContainer = document.getElementById('serialNumbersPreview');
+    const nameField = document.getElementById('name');
+    const quantityField = document.getElementById('available_quantity');
+
+    function getUniqueNumber(product_name) {
+        // Extract the first three chars and the last char of the product name
+        const abbreviation = product_name.substring(0, 3).toUpperCase();
+        const last_char = product_name.charAt(product_name.length - 1).toUpperCase();
+        const code = abbreviation + last_char;
+
+        // Generate a random UUID and then take the first 8 characters of its hex form
+        const uuidStr = crypto.randomUUID().replace(/-/g, '').substring(0, 8).toUpperCase();
+        return code + uuidStr;
+    }
+
+    function generateSerialNumbers(name, quantity) {
+        // For example: First 3 chars + last char of the product's name, uppercase
+        const abbreviation = name.slice(0, 3).toUpperCase() + name.slice(-1).toUpperCase();
+        let serialNumbers = [];
+        for (let i = 1; i <= quantity; i++) {
+
+            const serialNumber = getUniqueNumber(name);
+            serialNumbers.push(serialNumber);
+        }
+        return serialNumbers;
+    }
+
+    function updateSerialNumbersPreview() {
+        const productName = nameField.value.trim();
+        const quantity = parseInt(quantityField.value, 10);
+
+        // Only generate if we have a product name and a valid quantity
+        if (productName && !isNaN(quantity) && quantity > 0) {
+            const serials = generateSerialNumbers(productName, quantity);
+            previewContainer.innerHTML = `
+                <h3>Preview of Serial Numbers:</h3>
+                <ul>
+                    ${serials.map(sn => `<li>${sn}</li>`).join('')}
+                </ul>
+            `;
+            document.getElementById('serial_numbers').value = JSON.stringify(serials);
+        } else {
+            previewContainer.innerHTML = '';
+        }
+    }
+
+    // Add event listeners to generate preview when user inputs change
+    nameField.addEventListener('input', updateSerialNumbersPreview);
+    quantityField.addEventListener('input', updateSerialNumbersPreview);
+
+    function fetchAndUpdateProducts(sellerId) {
+        const productsContainer = document.querySelector('#pills-products .row'); // Target the row inside the div
+
+        // Fetch the products from the backend
+        fetch(`/seller/products`)
+            .then(response => response.json())
+            .then(data => {
+                const products = data.products;
+                productsContainer.innerHTML = ''; // Clear the container before adding new products
+
+                // Generate HTML for each product dynamically
+                products.forEach(product => {
+                    const productElement = document.createElement('div');
+                    productElement.className = 'col-2 product';
+                    productElement.innerHTML = `
+                    <img src="${product.image_url}" alt="${product.name}" class="product-image">
+                    <p>Name: ${product.name}</p>
+                    <p>Color: ${product.color}</p>
+                    <p>Price: $${product.cost}</p>
+                    <p>Quantity: ${product.available_quantity}</p>
+                    <p>ID: ${product.product_id}</p>
+                `;
+                    productsContainer.appendChild(productElement);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching products:', error);
+            });
+    }
+
+    // Call this function when the "My Products" tab is clicked
+    document.getElementById('pills-products-tab').addEventListener('click', function () {
+        const sellerId = document.getElementById('seller_id').value; // Fetch seller ID from the hidden input
+        console.log("seller id :"+sellerId);
+        fetchAndUpdateProducts(sellerId); // Fetch and update products
+    });
+
+
 </script>
 <!-- Link to Bootstrap JS and Popper.js -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

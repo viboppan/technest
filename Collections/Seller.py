@@ -1,9 +1,13 @@
+import datetime
+
 from flask import Blueprint, request, render_template, redirect
 from mongoengine import connect
 
 from Collections.Order import get_orders_for_seller
+
 from utils.MongoUtility import Product
 from utils.MongoUtility import Seller
+from flask import session
 
 seller_endpoints = Blueprint('seller_endpoints', __name__, template_folder='templates')
 connect(host="mongodb://localhost:27017/technest")
@@ -37,22 +41,41 @@ def add_user():
         seller = Seller.objects(seller_name=seller_name).first()
         if seller:
             return "username already taken"
-        seller = Seller.objects(email=email).first()
-        if seller:
-            return "email already taken"
-        contact_number = request.form.get('contact_number')
-        print("hellooooooooooooooooooooooooooooooo")
+            # Get the other fields
+        first_name = request.form.get('first_name')
+        last_name = request.form.get('last_name')
+        phone = request.form.get('phone')  # The form field was named 'phone'
+        ssn = request.form.get('ssn')
+        dob_str = request.form.get('dob')
+        address_line1 = request.form.get('address_line1')
+        address_line2 = request.form.get('address_line2')
+        city = request.form.get('city')
+        state = request.form.get('state')
+        zipcode = request.form.get('zipcode')
+        full_address = f"{address_line1}, {address_line2}, {city}, {state} {zipcode}".strip(", ")
+        # Parse the DOB from the form (assuming format YYYY-MM-DD)
+        dob = None
+        if dob_str:
+            try:
+                dob = datetime.datetime.strptime(dob_str, '%Y-%m-%d').date()
+            except ValueError:
+                return "Invalid date format for DOB. Please use YYYY-MM-DD."
+
         # Create a new seller
+        # Create a new seller with additional fields
         new_seller = Seller(
-            first_name=request.form.get('first_name'),
-            last_name=request.form.get('last_name'),
+            first_name=first_name,
+            last_name=last_name,
             seller_name=seller_name,
             email=email,
             password=password,
-            mobile_number=contact_number
+            mobile_number=phone,
+            ssn=ssn,
+            dob=dob,
+            address=full_address
         )
         new_seller.save()
-        return redirect('/seller_home/' + str(new_seller.id))
+        return redirect('/seller')
 
     else:
         return "method not allowed"
@@ -63,11 +86,13 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        print(username)
         # Check if the user exists
         seller = Seller.objects(seller_name=username).first()
         if seller and seller.password == password:
-            print(seller.id)
+            if not seller.approved:
+                error = "Your account is not approved by the admin yet. Please wait for approval."
+                return render_template('seller_login.html', error=error)
+            session['seller_id'] = str(seller.id)
             ordered_products1 = get_orders_for_seller(str(seller.id))
             print("post order")
             print(ordered_products1)
@@ -76,27 +101,28 @@ def login():
             error = "Invalid username or password. Please try again."
             return render_template('seller_login.html', error=error)
 
-    # return render_template('seller.html')
-
-    # Function to get orders for a given customer
-
 
 @seller_endpoints.route('/seller_home/<seller_id>')
 def seller_home(seller_id):
+    seller_id = session.get('seller_id')
     products = Product.objects(seller_id=seller_id)
     products_data = []
     if products:
-        products_data = [
-            {"name": p.name, "cost": p.cost, "dimensions": p.dimensions, "color": p.color, "brand": p.brand,
-             "material": p.material_type, "weight": p.weight, "seller_id": p.seller_id,
-             "rating": p.rating, "image_url": p.image_url, "product_id": str(p.id),
-             "available_quantity": p.available_quantity, "category": p.category} for p in products]
+        products_data = format_products(products)
     return render_template('seller.html', ordered_products=get_orders_for_seller(seller_id), seller_id=seller_id,
                            products_data=products_data)
 
 
+@seller_endpoints.route('/seller/products/', methods=['GET'])
+def get_seller_products():
+    seller_id = session.get('seller_id')
+    products = Product.objects(seller_id=seller_id)
+    return {"products": format_products(products)}
+
+
 @seller_endpoints.route('/seller_logout')
 def seller_logout():
+    session.clear()
     return redirect('/')
 
 
@@ -105,6 +131,27 @@ def get_products():
     products_data = [
         {"name": p.name, "cost": p.cost, "dimensions": p.dimensions, "color": p.color, "brand": p.brand,
          "material": p.material_type, "weight": p.weight, "seller_id": p.seller_id,
-         "rating": p.rating, "image_url": p.image_url, "product_id": str(p.id),
+         "image_url": p.image_url, "product_id": str(p.id),
          "available_quantity": p.available_quantity, "category": p.category} for p in products]
+    return products_data
+
+
+def format_products(products):
+    products_data = [
+        {
+            "name": p.name,
+            "cost": p.cost,
+            "dimensions": p.dimensions,
+            "color": p.color,
+            "brand": p.brand,
+            "material": p.material_type,
+            "weight": p.weight,
+            "seller_id": p.seller_id,
+            "image_url": p.image_url,
+            "product_id": str(p.id),
+            "available_quantity": p.available_quantity,
+            "category": p.category
+        }
+        for p in products
+    ]
     return products_data

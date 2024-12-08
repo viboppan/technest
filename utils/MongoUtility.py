@@ -17,6 +17,8 @@ class Customer(Document):
     email = EmailField()
     password = StringField()
     mobile_number = StringField()
+    # New fields
+    dob = DateField()  # Storing just the date component
     address = StringField()
     order_history = ListField(ObjectIdField())
 
@@ -31,7 +33,6 @@ class Product(Document):
     material_type = StringField()
     weight = FloatField()
     seller_id = StringField()
-    rating = FloatField()
     image_url = StringField()
     category = StringField()
     description = StringField()
@@ -45,13 +46,17 @@ class Seller(Document):
     password = StringField()
     email = EmailField()
     mobile_number = StringField()
+    # New fields
+    ssn = StringField()
+    dob = DateField()  # Storing just the date component
     address = StringField()
-    # products = ListField(field=ObjectIdField)
+    approved = BooleanField(default=False)
 
 
 class ProductBought(EmbeddedDocument):
     product_id = ReferenceField('Product', required=True)
     quantity = IntField(min_value=1)
+    serial_numbers = ListField(StringField())
 
 
 class Order(Document):
@@ -71,12 +76,8 @@ class Payment(Document):
     status = StringField()
 
 
-class Book(Document):
-    book_id = SequenceField(primary_key=True)  # Auto-incrementing unique ID
-    title = StringField(required=True)
-    author = StringField(required=True)
-    genre = StringField()
-    publication_date = DateField()
-    isbn = StringField(unique=True)
-    availability_status = StringField(choices=["available", "checked out", "reserved"], default="available")
-    media_type = StringField(choices=["book", "CD", "DVD", "e-book"], default="book")
+class ProductInstance(Document):
+    product = ReferenceField(Product, required=True)
+    serial_number = StringField(required=True, unique=True)
+    status = StringField(default='in_stock')  # e.g., 'in_stock', 'shipped', 'delivered'
+    # You can add other fields as needed
